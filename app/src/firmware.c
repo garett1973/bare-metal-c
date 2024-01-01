@@ -2,28 +2,34 @@
 #include <libopencm3/stm32/gpio.h>
 
 #define LED_PORT (GPIOA)
-#define LED_PIN  (GPIO5)
+#define LED_PIN (GPIO5)
 
-static void rcc_setup(void) {
-  rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
+static void rcc_setup(void)
+{
+  rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]); // Setup PLL to run at 84MHz
 }
 
-static void gpio_setup(void) {
-  rcc_periph_clock_enable(RCC_GPIOA);
-  gpio_mode_setup(LED_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_PIN);
+static void gpio_setup(void)
+{
+  rcc_periph_clock_enable(RCC_GPIOA);                                   // Enable GPIOA clock, by default GPIOA is enabled
+  gpio_mode_setup(LED_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_PIN); // Setup GPIOA5 as output
 }
 
-static void delay_cycles(uint32_t cycles) {
-  for (uint32_t i = 0; i < cycles; i++) {
+static void delay_cycles(uint32_t cycles) // Delay function, calibrated for STM32F4 running at 84MHz
+{
+  for (uint32_t i = 0; i < cycles; i++)
+  {
     __asm__("nop");
   }
 }
 
-int main(void) {
+int main(void)
+{
   rcc_setup();
   gpio_setup();
 
-  while (1) {
+  while (1)
+  {
     gpio_toggle(LED_PORT, LED_PIN);
     delay_cycles(84000000 / 4);
   }
